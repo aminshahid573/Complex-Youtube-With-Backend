@@ -1,0 +1,17 @@
+node_modules
+node_modules_container
+docs
+.git
+*.env
+.env
+.env.*
+jdl/**/.jhipster/**
+.vscode-test
+/.vscode
+**/templates/**/
+**/jdl-core.min.js
+**/generated-serialized-grammar.js
+test/fixtures/**
+dist
+coverage
+BadEntity.json
