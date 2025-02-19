@@ -1,0 +1,22 @@
+{
+  "name": "complex-youtube-with-backend",
+  "version": "1.0.0",
+  "description": "A complex youtube website with micro features",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "javascipt",
+    "backend",
+    "express",
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "Shahid Amin",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
