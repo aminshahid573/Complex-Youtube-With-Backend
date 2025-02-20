@@ -14,8 +14,7 @@ const uploadOnCloudinary = async (localFilePath) => {
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
     });
-    //file has benn uploaded successfully
-    console.log("File uploaded successfully on cloudinary", response.url);
+    fs.unlinkSync(localFilePath); // remove the locally saved temprory file after successful upload
 
     return response;
   } catch (error) {
