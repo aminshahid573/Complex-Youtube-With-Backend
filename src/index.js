@@ -15,7 +15,13 @@ connectDB()
   })
   .catch((error) => console.log("MONGODB CONNECTION FAILED", error));
 
-//Nice Approach for connecting Database but it make our index.js file bigger and messy
+
+
+
+
+
+
+  //Nice Approach for connecting Database but it make our index.js file bigger and messy
 /*
 import mongoose from "mongoose";
 import { DB_NAME } from "./constants";
