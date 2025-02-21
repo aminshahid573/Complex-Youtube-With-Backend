@@ -292,6 +292,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Avatar file is required");
   }
 
+  //TODO: Delete old image after updating new image
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
   if (!avatar.url) {
@@ -341,6 +342,71 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Cover image updated successfully"));
 });
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+
+  if (!username?.trim()) {
+    throw new ApiError(400, "Username is required");
+  }
+
+//writing aggreation pipelines
+//TODO: understand aggregation pipelines deeply and write your own
+ const channel =await User.aggregate([
+  {
+    $match:{
+      username: username?.toLowerCase()
+    }
+  },
+  {
+    $lookup:{
+      from: "Subscription",
+      localField: "_id",
+      foreignField: "channel",
+      as: "subscribers"
+    }
+  },
+  {
+    $lookup:{
+      from: "Subscription",
+      localField: "_id",
+      foreignField: "subscriber",
+      as: "subscribedTo"
+    }
+  },
+  {
+    $addFields:{
+      subscribersCount: {
+        $size: "$subscribers"
+      },
+      channelsSubscribedToCount:{
+        $size: "$subscribedTo"
+      },
+      isSubscribed:{
+        $cond:{
+          if: {$in: [req.user?._id, "$subscribers.subscriber"]},
+          then: true,
+          else: false
+        }
+      }
+    }
+  },
+  {
+    $project:{
+      fullName: 1,
+      username: 1,
+      subscribersCount: 1,
+      channelsSubscribedToCount: 1,
+      isSubscribed: 1,
+      avatar: 1,
+      coverImage: 1,
+      email: 1,
+      createdAt: 1,
+    }
+  }
+ ])
+
+});
+
 export {
   registerUser,
   loginUser,
@@ -351,4 +417,5 @@ export {
   updateAccountDetails,
   updateUserAvatar,
   updateUserCoverImage,
+  getUserChannelProfile,
 };
