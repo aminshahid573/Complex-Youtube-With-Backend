@@ -349,62 +349,128 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Username is required");
   }
 
-//writing aggreation pipelines
-//TODO: understand aggregation pipelines deeply and write your own
- const channel =await User.aggregate([
-  {
-    $match:{
-      username: username?.toLowerCase()
-    }
-  },
-  {
-    $lookup:{
-      from: "Subscription",
-      localField: "_id",
-      foreignField: "channel",
-      as: "subscribers"
-    }
-  },
-  {
-    $lookup:{
-      from: "Subscription",
-      localField: "_id",
-      foreignField: "subscriber",
-      as: "subscribedTo"
-    }
-  },
-  {
-    $addFields:{
-      subscribersCount: {
-        $size: "$subscribers"
+  //writing aggreation pipelines
+  //TODO: understand aggregation pipelines deeply and write your own
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username?.toLowerCase(),
       },
-      channelsSubscribedToCount:{
-        $size: "$subscribedTo"
+    },
+    {
+      $lookup: {
+        from: "Subscription",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
       },
-      isSubscribed:{
-        $cond:{
-          if: {$in: [req.user?._id, "$subscribers.subscriber"]},
-          then: true,
-          else: false
-        }
+    },
+    {
+      $lookup: {
+        from: "Subscription",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    {
+      $addFields: {
+        subscribersCount: {
+          $size: "$subscribers",
+        },
+        channelsSubscribedToCount: {
+          $size: "$subscribedTo",
+        },
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        fullName: 1,
+        username: 1,
+        subscribersCount: 1,
+        channelsSubscribedToCount: 1,
+        isSubscribed: 1,
+        avatar: 1,
+        coverImage: 1,
+        email: 1,
+        createdAt: 1,
+      },
+    },
+  ]);
+
+  if (!channel?.length) {
+    throw new ApiError(404, "Channel not found");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, channel[0], "Channel profile fetched successfully")
+    );
+});
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+  const user = await User.aggregate([
+    {
+      //here we convert user id whic is string to object id
+      //now you will say then why you use req.user._id directly in other queries
+      //bcoz in other queries mongoose automatically convert string to object id but in aggregation we have to do it manually bcoz mongoose send aggregation query to mongodb as it is withot converting string to object id
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.user._id),
+      },
+    },
+    {
+      $lookup:{
+        from : "videos",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "watchHistory",
+        pipeline:[
+          {
+            $lookup:{
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline:[
+                {
+                  $project:{
+                    fullName: 1,
+                    username: 1,
+                    avatar: 1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $addFields:{
+              owner:{
+                $first: "$owner"
+              }
+            }
+          }
+        ]
       }
     }
-  },
-  {
-    $project:{
-      fullName: 1,
-      username: 1,
-      subscribersCount: 1,
-      channelsSubscribedToCount: 1,
-      isSubscribed: 1,
-      avatar: 1,
-      coverImage: 1,
-      email: 1,
-      createdAt: 1,
-    }
-  }
- ])
+  ]);
 
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      user[0]?.watchHistory || [],
+      "Watch history fetched successfully"
+    )
+  )
 });
 
 export {
