@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -164,8 +165,8 @@ const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
+      $unset: {
+        refreshToken: 1, //this removes the field from document
       },
     },
     {
@@ -258,7 +259,9 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .json(200, req.user, "User details fetched successfully");
+    .json(
+      new ApiResponse(200, req.user, "Current user fetched successfully")
+    );
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -428,14 +431,14 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     },
     {
       $lookup:{
-        from : "videos",
+        from : "Video",
         localField: "watchHistory",
         foreignField: "_id",
         as: "watchHistory",
         pipeline:[
           {
             $lookup:{
-              from: "users",
+              from: "User",
               localField: "owner",
               foreignField: "_id",
               as: "owner",
