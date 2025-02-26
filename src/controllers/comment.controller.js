@@ -1,5 +1,6 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Comment } from "../models/comment.model.js";
+import { Video } from "../models/video.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -28,7 +29,48 @@ const getVideoComments = asyncHandler(async (req, res) => {
     { $match: { video: new mongoose.Types.ObjectId(videoId) } },
     { $sort: { createdAt: -1 } },
     { $skip: (parseInt(page) - 1) * parseInt(limit) },
-    { $limit: parseInt(limit) }, // Fixed: Changed 'limit' to '$limit'
+    { $limit: parseInt(limit) },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "comment",
+        as: "likes",
+        pipeline: [{ $count: "total" }],
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+        pipeline: [
+          {
+            $project: {
+              username: 1,
+              fullName: 1,
+              avatar: 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      $addFields: {
+        likesCount: { $ifNull: [{ $arrayElemAt: ["$likes.total", 0] }, 0] },
+        owner: { $arrayElemAt: ["$owner", 0] }
+      },
+    },
+    {
+      $project: {
+        content: 1,
+        video: 1,
+        owner: 1,
+        createdAt: 1,
+        likesCount: 1
+      }
+    }
   ]);
 
   const totalPages = Math.ceil(totalComments / parseInt(limit)); // Fixed: Parse limit to integer
