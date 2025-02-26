@@ -15,7 +15,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     sortType = "desc",
     userId,
   } = req.query;
-  console.table({page,limit,query,sortBy,sortType,userId})
+  console.table({ page, limit, query, sortBy, sortType, userId });
   //TODO: get all videos based on query, sort, pagination
 
   if (page < 1 || limit < 1) {
@@ -85,8 +85,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
   } catch (error) {
     throw new ApiError(500, error?.message || "Failed to fetch videos");
   }
-
- 
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -152,7 +150,27 @@ const getVideoById = asyncHandler(async (req, res) => {
   }
 
   try {
-    const video = await Video.findById(videoId);
+    const video = await Video.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "video",
+          as: "likes",
+        },
+      },
+      {
+        $addFields: {
+          likesCount: { $size: "$likes" },
+        },
+      },
+      {
+        $project: {
+          likes: 0,
+        },
+      },
+    ]);
 
     if (!video) {
       throw new ApiError(400, "Video not found!");
