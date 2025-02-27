@@ -124,7 +124,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
       {
         $lookup: {
           from: "users",
-          localField: "channel",
+          localField: "channel", 
           foreignField: "_id",
           as: "channelDetails",
           pipeline: [
@@ -140,13 +140,34 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         }
       },
       {
+        $lookup: {
+          from: "subscriptions",
+          localField: "channel",
+          foreignField: "channel",
+          as: "subscriberCount",
+          pipeline: [
+            {
+              $count: "count"
+            }
+          ]
+        }
+      },
+      {
         $addFields: {
-          channelDetails: { $first: "$channelDetails" }
+          channelDetails: { $first: "$channelDetails" },
+          subscriberCount: { $first: "$subscriberCount.count" }
         }
       },
       {
         $facet: {
-          channels: [],
+          channels: [
+            {
+              $project: {
+                channelDetails: 1,
+                subscriberCount: { $ifNull: ["$subscriberCount", 0] }
+              }
+            }
+          ],
           totalCount: [
             {
               $count: "count"
@@ -170,11 +191,11 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         subscribedChannels,
-        "Subscribed Channel Fetched Sucessfully."
+        "Subscribed Channel Fetched Successfully."
       )
     )
   } catch (error) {
-    throw new ApiError(500, error?.message || "Faild to Get Channels")
+    throw new ApiError(500, error?.message || "Failed to Get Channels")
   }
 
 });

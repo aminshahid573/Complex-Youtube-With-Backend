@@ -151,7 +151,9 @@ export function YoutubeHeader() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <Link to={`/c/${user.username}`}>
                   <DropdownMenuItem>Your Channel</DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem>YouTube Studio</DropdownMenuItem>
                   <DropdownMenuItem>Switch Account</DropdownMenuItem>
                   <DropdownMenuItem>Sign Out</DropdownMenuItem>

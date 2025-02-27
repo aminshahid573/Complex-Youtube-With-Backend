@@ -352,8 +352,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Username is required");
   }
 
-  //writing aggreation pipelines
-  //TODO: understand aggregation pipelines deeply and write your own
   const channel = await User.aggregate([
     {
       $match: {
@@ -362,7 +360,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: "Subscription",
+        from: "subscriptions", // Collection name should be lowercase
         localField: "_id",
         foreignField: "channel",
         as: "subscribers",
@@ -370,8 +368,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: "Subscription",
-        localField: "_id",
+        from: "subscriptions",
+        localField: "_id", 
         foreignField: "subscriber",
         as: "subscribedTo",
       },
@@ -386,7 +384,18 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         },
         isSubscribed: {
           $cond: {
-            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            if: {
+              $in: [
+                new mongoose.Types.ObjectId(req.user?._id),
+                {
+                  $map: {
+                    input: "$subscribers",
+                    as: "subscriber",
+                    in: "$$subscriber.subscriber"
+                  }
+                }
+              ]
+            },
             then: true,
             else: false,
           },
@@ -476,7 +485,42 @@ const getWatchHistory = asyncHandler(async (req, res) => {
   )
 });
 
+const findUserIdByUsername = asyncHandler(async(req,res)=>{
+  const { username } = req.params;
+
+  if (!username) {
+    throw new ApiError(400, "Username is required");
+  }
+
+  const user = await User.aggregate([
+    {
+      $match: {
+        username: username
+      }
+    },
+    {
+      $project: {
+        _id: 1
+      }
+    }
+  ]);
+
+  if (!user.length) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { userId: user[0]._id },
+        "User ID fetched successfully"
+      )
+    );
+})
 export {
+  findUserIdByUsername,
   registerUser,
   loginUser,
   logoutUser,

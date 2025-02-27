@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   changeCurrentPassword,
+  findUserIdByUsername,
   getCurrentUser,
   getUserChannelProfile,
   getWatchHistory,
@@ -51,5 +52,9 @@ router
 router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
  
 router.route("/history").get(verifyJWT, getWatchHistory);
+
+router
+.route("/get-userid/:username")
+.get(findUserIdByUsername);
 
 export default router;

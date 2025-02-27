@@ -28,8 +28,8 @@ const router = createBrowserRouter(
       <Route path="" element={<Home />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/video" element={<VideoDetail />} />
-      <Route path="/channel" element={<ChannelPage />} />
+      <Route path="/video/:videoId" element={<VideoDetail />} />
+      <Route path="/c/:username" element={<ChannelPage />} />
     </Route>
   )
 );
@@ -42,13 +42,12 @@ createRoot(document.getElementById("root")).render(
           <YoutubeHeader />
           <div className="flex flex-1">
             <YoutubeSidebar />
-            <RouterProvider router={router} />
+            <div className="flex-1">
+              <RouterProvider router={router} />
+            </div>
           </div>
         </div>
       </SidebarProvider>
     </Provider>
   </StrictMode>
 );
-
-
-

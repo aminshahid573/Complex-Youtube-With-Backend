@@ -35,8 +35,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
         from: "likes",
         localField: "_id",
         foreignField: "comment",
-        as: "likes",
-        pipeline: [{ $count: "total" }],
+        as: "likes"
       },
     },
     {
@@ -58,8 +57,24 @@ const getVideoComments = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        likesCount: { $ifNull: [{ $arrayElemAt: ["$likes.total", 0] }, 0] },
-        owner: { $arrayElemAt: ["$owner", 0] }
+        likesCount: { $size: "$likes" },
+        owner: { $arrayElemAt: ["$owner", 0] },
+        isLiked: {
+          $cond: {
+            if: { $gt: [
+              { $size: { 
+                $filter: {
+                  input: "$likes",
+                  as: "like",
+                  cond: { $eq: ["$$like.likedBy", new mongoose.Types.ObjectId(req.user?._id)] }
+                }
+              }}, 
+              0
+            ]},
+            then: true,
+            else: false
+          }
+        }
       },
     },
     {
@@ -68,7 +83,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
         video: 1,
         owner: 1,
         createdAt: 1,
-        likesCount: 1
+        likesCount: 1,
+        isLiked: 1
       }
     }
   ]);

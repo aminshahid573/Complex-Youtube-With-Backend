@@ -1,15 +1,15 @@
-export function VideoPlayer({ videoId }) {
+export function VideoPlayer({src }) {
     return (
       <div className="aspect-video w-full bg-muted">
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}`}
+        <video
+          src={src}
           title="YouTube video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
+          controls
+          playsInline
           className="h-full w-full"
-        ></iframe>
+        >
+          Your browser does not support the video tag.
+        </video>
       </div>
     )
   }
-  
-  

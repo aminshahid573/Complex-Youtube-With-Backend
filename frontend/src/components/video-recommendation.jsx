@@ -1,43 +1,29 @@
-import { VideoCard } from "@/components/video-card"
+import { VideoCard } from "@/components/video-card";
 
 const recommendedVideos = [
   {
-    id: 1,
-    title: "Advanced React Hooks: useCallback and useMemo",
-    thumbnail: "/placeholder.svg?height=200&width=360",
-    duration: "18:24",
-    channel: {
-      name: "React Masters",
-      avatar: "/placeholder.svg?height=32&width=32",
+    _id: "67b9563489f4e21da276fab6",
+    videoFile:
+      "http://res.cloudinary.com/dqq8qdgtp/video/upload/v1740199479/zayi0nog7pe8ssvt43kq.mp4",
+    thumbnail:
+      "http://res.cloudinary.com/dqq8qdgtp/image/upload/v1740199480/zynwzirzea3po9ocus4h.png",
+    title: "title",
+    description: "this is description",
+    duration: 30.526667,
+    views: 0,
+    isPublished: true,
+    owner: {
+      _id: "67b7454946a02fe6b341009c",
+      username: "zeeshan",
+
+      fullName: "Zeeshan Faiyaz",
     },
-    views: "450K",
-    uploadedAt: "3 weeks ago",
+    createdAt: "2025-02-22T04:44:36.843Z",
+    updatedAt: "2025-02-22T04:44:36.843Z",
+    __v: 0,
+    likesCount: 0,
   },
-  {
-    id: 2,
-    title: "CSS Grid Layout: A Comprehensive Guide",
-    thumbnail: "/placeholder.svg?height=200&width=360",
-    duration: "22:15",
-    channel: {
-      name: "CSS Wizards",
-      avatar: "/placeholder.svg?height=32&width=32",
-    },
-    views: "320K",
-    uploadedAt: "1 month ago",
-  },
-  {
-    id: 3,
-    title: "Building a RESTful API with Node.js and Express",
-    thumbnail: "/placeholder.svg?height=200&width=360",
-    duration: "31:42",
-    channel: {
-      name: "Backend Devs",
-      avatar: "/placeholder.svg?height=32&width=32",
-    },
-    views: "280K",
-    uploadedAt: "2 weeks ago",
-  },
-]
+];
 
 export function VideoRecommendations() {
   return (
@@ -46,6 +32,5 @@ export function VideoRecommendations() {
         <VideoCard key={video.id} video={video} />
       ))}
     </div>
-  )
+  );
 }
-

@@ -3,6 +3,7 @@ import {
     addVideoToPlaylist,
     createPlaylist,
     deletePlaylist,
+    getAllPlaylistByUserId,
     getPlaylistById,
     getUserPlaylists,
     removeVideoFromPlaylist,

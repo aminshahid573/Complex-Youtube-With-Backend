@@ -25,7 +25,6 @@ const createTweet = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, tweet, "Tweet created successfully"));
 });
-
 const getUserTweets = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
@@ -43,9 +42,35 @@ const getUserTweets = asyncHandler(async (req, res) => {
       }
     },
     {
+      $lookup: {
+        from: "likes",
+        let: { tweetId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$tweet", "$$tweetId"] },
+                  { $eq: ["$likedBy", req.user?._id] }
+                ]
+              }
+            }
+          }
+        ],
+        as: "isLiked"
+      }
+    },
+    {
       $addFields: {
         likesCount: {
           $ifNull: [{ $arrayElemAt: ["$likesCount.total", 0] }, 0]
+        },
+        isLiked: {
+          $cond: {
+            if: { $gt: [{ $size: "$isLiked" }, 0] },
+            then: true,
+            else: false
+          }
         }
       }
     },
@@ -55,7 +80,8 @@ const getUserTweets = asyncHandler(async (req, res) => {
         content: 1,
         owner: 1,
         createdAt: 1,
-        likesCount: 1
+        likesCount: 1,
+        isLiked: 1
       }
     }
   ]);
