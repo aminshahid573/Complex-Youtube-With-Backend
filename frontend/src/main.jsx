@@ -42,7 +42,7 @@ createRoot(document.getElementById("root")).render(
           <YoutubeHeader />
           <div className="flex flex-1">
             <YoutubeSidebar />
-            <div className="flex-1">
+            <div className="flex-1 px-4">
               <RouterProvider router={router} />
             </div>
           </div>
