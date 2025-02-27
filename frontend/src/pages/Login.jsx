@@ -40,7 +40,7 @@ function Login() {
   };
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#121212] text-white">
+    <div className="h-screen overflow-y-auto  text-gray-950">
       <div className="mx-auto my-8 flex w-full max-w-sm flex-col px-4">
         <div className="mx-auto inline-block w-16">
           <svg

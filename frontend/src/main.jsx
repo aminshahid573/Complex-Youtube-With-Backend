@@ -7,24 +7,48 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
 import Layout from "./Layout.jsx";
 import Home from "./pages/Home.jsx";
-import Register from "./pages/Register.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
 import Login from "./pages/Login.jsx";
+
+import YoutubeSidebar from "@/components/youtube-sidebar"
+import { YoutubeHeader } from "@/components/youtube-header"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import VideoDetail from "./pages/VideoDetail.jsx";
+import ChannelPage from "./pages/ChannelPage.jsx";
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route path="" element={<Home />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/video" element={<VideoDetail />} />
+      <Route path="/channel" element={<ChannelPage />} />
     </Route>
   )
 );
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <SidebarProvider>
+        <div className="relative flex min-h-screen flex-col w-full">
+          <YoutubeHeader />
+          <div className="flex flex-1">
+            <YoutubeSidebar />
+            <RouterProvider router={router} />
+          </div>
+        </div>
+      </SidebarProvider>
+    </Provider>
   </StrictMode>
 );
+
+
+
