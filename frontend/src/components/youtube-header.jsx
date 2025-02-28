@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useSelector } from "react-redux";
-import { Link, BrowserRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 export function YoutubeHeader() {
@@ -29,7 +29,7 @@ export function YoutubeHeader() {
   }, [auth?.data]);
 
   return (
-    <BrowserRouter>
+    
       <header className="sticky top-0 z-40 w-full border-b bg-background">
         <div className="flex h-16 items-center px-4">
           {/* Logo section */}
@@ -175,6 +175,6 @@ export function YoutubeHeader() {
           </div>
         </div>
       </header>
-    </BrowserRouter>
+   
   );
 }

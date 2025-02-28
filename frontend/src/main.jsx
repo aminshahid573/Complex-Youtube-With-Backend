@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import {
+  BrowserRouter,
   createBrowserRouter,
   createRoutesFromElements,
   Route,
@@ -14,6 +15,7 @@ import Layout from "./Layout.jsx";
 import Home from "./pages/Home.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import Login from "./pages/Login.jsx";
+import PublishPage from "./pages/PublishPage.jsx";
 
 import YoutubeSidebar from "@/components/youtube-sidebar"
 import { YoutubeHeader } from "@/components/youtube-header"
@@ -22,32 +24,37 @@ import VideoDetail from "./pages/VideoDetail.jsx";
 import ChannelPage from "./pages/ChannelPage.jsx";
 
 
+const AppLayout = () => (
+<SidebarProvider>
+    <div className="relative flex min-h-screen flex-col w-full">
+    <YoutubeHeader />
+    <div className="flex flex-1">
+        <YoutubeSidebar />
+        <div className="flex-1">
+        <Layout />
+        </div>
+    </div>
+    </div>
+</SidebarProvider>
+);
+
 const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      <Route path="" element={<Home />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/video/:videoId" element={<VideoDetail />} />
-      <Route path="/c/:username" element={<ChannelPage />} />
+createRoutesFromElements(
+    <Route path="/" element={<AppLayout />}>
+    <Route path="" element={<Home />} />
+    <Route path="/register" element={<RegisterPage />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/video/:videoId" element={<VideoDetail />} />
+    <Route path="/c/:username" element={<ChannelPage />} />
+    <Route path="/publish-video" element={<PublishPage />} />
     </Route>
-  )
+)
 );
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+<StrictMode>
     <Provider store={store}>
-      <SidebarProvider>
-        <div className="relative flex min-h-screen flex-col w-full">
-          <YoutubeHeader />
-          <div className="flex flex-1">
-            <YoutubeSidebar />
-            <div className="flex-1 px-4">
-              <RouterProvider router={router} />
-            </div>
-          </div>
-        </div>
-      </SidebarProvider>
+    <RouterProvider router={router} />
     </Provider>
-  </StrictMode>
+</StrictMode>
 );
